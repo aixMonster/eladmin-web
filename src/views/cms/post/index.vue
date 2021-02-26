@@ -5,11 +5,11 @@
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <label class="el-form-item-label">标题</label>
-        <el-input v-model="query.filter" clearable placeholder="标题" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.title" clearable placeholder="标题" style="width: 185px;" class="filter-item" @keyup.enter.native="queryHandler" />
         <label class="el-form-item-label">内容</label>
-        <el-input v-model="query.filter" clearable placeholder="内容" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.content" clearable placeholder="内容" style="width: 185px;" class="filter-item" @keyup.enter.native="queryHandler" />
         <label class="el-form-item-label">作者</label>
-        <el-input v-model="query.filter" clearable placeholder="作者" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.author" clearable placeholder="作者" style="width: 185px;" class="filter-item" @keyup.enter.native="queryHandler" />
         <rrOperation :crud="crud" />
       </div>
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
@@ -91,6 +91,17 @@ export default {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
     [CRUD.HOOK.beforeRefresh]() {
       return true
+    },
+    queryHandler() {
+      const queryString = []
+      for (const [key, value] of Object.entries(this.query)) {
+        if (typeof key !== 'undefined') {
+          queryString.push(key.concat('=like=').concat(value))
+        }
+      }
+      this.query.filter = queryString.join(';')
+      this.crud.toQuery()
+      this.query = {}
     }
   }
 }
