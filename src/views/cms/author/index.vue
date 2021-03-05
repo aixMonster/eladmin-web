@@ -64,7 +64,7 @@ export default {
   components: { pagination, crudOperation, rrOperation, udOperation },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   cruds() {
-    return CRUD({ title: '内容管理系统：作者管理', url: 'api/qslAuthor', idField: 'id', sort: 'id,desc', crudMethod: { ...crudQslAuthor }})
+    return CRUD({ title: '内容管理系统：作者管理', url: 'api/qslAuthor', idField: 'id', params: { prepare: 'name=isnotnull=""' }, query: { filter: 'name=isnotnull=""' }, sort: 'id,desc', crudMethod: { ...crudQslAuthor }})
   },
   data() {
     return {
@@ -92,8 +92,19 @@ export default {
       return true
     },
     queryHandler() {
-      this.query.filter = 'name=like='.concat(this.query.name)
+      const queryString = []
+      if (this.crud.params.prepare !== null && this.crud.params.prepare !== '' && this.crud.params.prepare !== undefined) {
+        queryString.push(this.crud.params.prepare)
+        this.crud.query.filter = ''
+      }
+      for (const [key, value] of Object.entries(this.crud.query)) {
+        if (value !== null && value !== '' && value !== undefined) {
+          queryString.push(key.concat('=like=').concat(value))
+        }
+      }
+      this.crud.query.filter = queryString.join(';')
       this.crud.toQuery()
+      this.crud.query.filter = ''
     }
   }
 }

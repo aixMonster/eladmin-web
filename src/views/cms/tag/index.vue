@@ -80,6 +80,21 @@ export default {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
     [CRUD.HOOK.beforeRefresh]() {
       return true
+    },
+    queryHandler() {
+      const queryString = []
+      if (this.crud.params.prepare !== null && this.crud.params.prepare !== '' && this.crud.params.prepare !== undefined) {
+        queryString.push(this.crud.params.prepare)
+        this.crud.query.filter = ''
+      }
+      for (const [key, value] of Object.entries(this.crud.query)) {
+        if (value !== null && value !== '' && value !== undefined) {
+          queryString.push(key.concat('=like=').concat(value))
+        }
+      }
+      this.crud.query.filter = queryString.join(';')
+      this.crud.toQuery()
+      this.crud.query.filter = ''
     }
   }
 }

@@ -36,7 +36,12 @@
         <el-table-column prop="id" label="ID" />
         <el-table-column prop="title" label="标题" />
         <el-table-column prop="content" label="内容" />
-        <el-table-column prop="authorId" label="作者" />
+        <el-table-column prop="qslAuthor.name" label="作者" />
+        <el-table-column prop="qslTags" label="标签">
+          <template slot-scope="scope">
+            {{ scope.row.qslTags.length }}
+          </template>
+        </el-table-column>
         <el-table-column prop="createBy" label="创建者" />
         <el-table-column prop="updateBy" label="更新者" />
         <el-table-column prop="createTime" label="创建日期" />
@@ -94,14 +99,18 @@ export default {
     },
     queryHandler() {
       const queryString = []
-      for (const [key, value] of Object.entries(this.query)) {
-        if (typeof key !== 'undefined') {
+      if (this.crud.params.prepare !== null && this.crud.params.prepare !== '' && this.crud.params.prepare !== undefined) {
+        queryString.push(this.crud.params.prepare)
+        this.crud.query.filter = ''
+      }
+      for (const [key, value] of Object.entries(this.crud.query)) {
+        if (value !== null && value !== '' && value !== undefined) {
           queryString.push(key.concat('=like=').concat(value))
         }
       }
-      this.query.filter = queryString.join(';')
+      this.crud.query.filter = queryString.join(';')
       this.crud.toQuery()
-      this.query = {}
+      this.crud.query.filter = ''
     }
   }
 }
